@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:olkonapp/data/converters/article_converter.dart';
 import 'package:olkonapp/data/news_repository_impl.dart';
 import 'package:olkonapp/data/user_repository_impl.dart';
-import 'package:olkonapp/domain/models/article.dart';
 import 'package:olkonapp/domain/news_repository.dart';
 import 'package:olkonapp/domain/user_repository.dart';
+import 'package:olkonapp/router.dart';
 import 'package:olkonapp/services/news_api.dart';
 import 'package:olkonapp/services/shared_preferences.dart';
-import 'package:olkonapp/ui/login_screen.dart';
-import 'package:olkonapp/ui/news_screen.dart';
-import 'package:olkonapp/ui/article_screen.dart';
+import 'package:olkonapp/ui/fragments/news_screen.dart';
+import 'package:olkonapp/ui/view_models/article_view_model.dart';
+import 'package:olkonapp/ui/view_models/login_view_model.dart';
+import 'package:olkonapp/ui/view_models/news_view_model.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -52,6 +52,26 @@ class _MyAppState extends State<MyApp> {
                       )
                       as NewsRepository,
         ),
+        ChangeNotifierProvider(
+          create:
+              (context) => NewsViewModel(
+                newsRepository: context.read<NewsRepository>(),
+                userRepository: context.read<UserRepository>(),
+              ),
+          child: const NewsScreen(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (context) => ArticleViewModel(
+                userRepository: context.read<UserRepository>(),
+              ),
+        ),
+        ChangeNotifierProvider<LoginViewModel>(
+          create:
+              (context) => LoginViewModel(
+                userRepository: context.read<UserRepository>(),
+              ),
+        ),
       ],
       child: FutureBuilder(
         future: _loadStates(),
@@ -64,42 +84,11 @@ class _MyAppState extends State<MyApp> {
           return FutureBuilder(
             future: userRepository.loadUserData(),
             builder: ((context, snapshot) {
-              final GoRouter _router = GoRouter(
-                initialLocation: '/${LoginScreen.routeName}',
-                routes: [
-                  GoRoute(
-                    path: '/${LoginScreen.routeName}',
-                    name: LoginScreen.routeName,
-                    builder: (context, state) => const LoginScreen(),
-                  ),
-                  GoRoute(
-                    path: '/${NewsScreen.routeName}',
-                    name: NewsScreen.routeName,
-                    builder: (context, state) => const NewsScreen(),
-                    routes: [
-                      GoRoute(
-                        path: ArticleScreen.routeName,
-                        name: ArticleScreen.routeName,
-                        builder: (context, state) {
-                          final article = state.extra as Article;
-                          return ArticleScreen(article: article);
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-                redirect: (context, state) {
-                  if (userRepository.getIsLoggedIn()) {
-                    return '/${NewsScreen.routeName}';
-                  }
-                  // no need to redirect at all
-                  return null;
-                },
-              );
+              var router = getRouter(userRepository); // Получаем роутер
 
               return MaterialApp.router(
                 debugShowCheckedModeBanner: false,
-                routerConfig: _router,
+                routerConfig: router,
               );
             }),
           );
