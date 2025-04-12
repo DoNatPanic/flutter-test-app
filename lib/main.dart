@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:go_router/go_router.dart';
 import 'package:olkonapp/data/converters/article_converter.dart';
 import 'package:olkonapp/data/news_repository_impl.dart';
 import 'package:olkonapp/data/user_repository_impl.dart';
@@ -29,65 +30,67 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Future<void> _loadStates() async {
-    // TODO load some SP data
-  }
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider(create: (context) => SharedPreferencesService()),
-        Provider(create: (context) => NewsApiService()),
-        Provider(create: (context) => ArticleConverter()),
-        Provider(
+        Provider<SharedPreferencesService>(
+          create: (BuildContext context) => SharedPreferencesService(),
+        ),
+        Provider<NewsApiService>(
+          create: (BuildContext context) => NewsApiService(),
+        ),
+        Provider<ArticleConverter>(
+          create: (BuildContext context) => ArticleConverter(),
+        ),
+        Provider<UserRepository>(
           create:
-              (context) =>
-                  UserRepositoryImpl(spService: context.read())
+              (BuildContext context) =>
+                  UserRepositoryImpl(sharedPreferencesService: context.read())
                       as UserRepository,
         ),
-        Provider(
+        Provider<NewsRepository>(
           create:
-              (context) =>
+              (BuildContext context) =>
                   NewsRepositoryImpl(
                         newsApiService: context.read(),
                         articleConverter: context.read(),
                       )
                       as NewsRepository,
         ),
-        ChangeNotifierProvider(
+        ChangeNotifierProvider<NewsViewModel>(
           create:
-              (context) => NewsViewModel(
+              (BuildContext context) => NewsViewModel(
                 newsRepository: context.read<NewsRepository>(),
                 userRepository: context.read<UserRepository>(),
               ),
           child: const NewsScreen(),
         ),
-        ChangeNotifierProvider(
+        ChangeNotifierProvider<ArticleViewModel>(
           create:
-              (context) => ArticleViewModel(
+              (BuildContext context) => ArticleViewModel(
                 userRepository: context.read<UserRepository>(),
               ),
         ),
         ChangeNotifierProvider<LoginViewModel>(
           create:
-              (context) => LoginViewModel(
+              (BuildContext context) => LoginViewModel(
                 userRepository: context.read<UserRepository>(),
               ),
         ),
       ],
-      child: FutureBuilder(
+      child: FutureBuilder<void>(
         future: _loadStates(),
-        builder: ((context, snapshot) {
-          var userRepository = Provider.of<UserRepository>(
+        builder: ((BuildContext context, AsyncSnapshot<void> snapshot) {
+          UserRepository userRepository = Provider.of<UserRepository>(
             context,
             listen: false,
           );
 
-          return FutureBuilder(
+          return FutureBuilder<void>(
             future: userRepository.loadUserData(),
-            builder: ((context, snapshot) {
-              var router = getRouter(userRepository); // Получаем роутер
+            builder: ((BuildContext context, AsyncSnapshot<void> snapshot) {
+              GoRouter router = getRouter(userRepository); // Получаем роутер
 
               return MaterialApp.router(
                 debugShowCheckedModeBanner: false,
@@ -98,5 +101,9 @@ class _MyAppState extends State<MyApp> {
         }),
       ),
     );
+  }
+
+  Future<void> _loadStates() async {
+    // TODO load some SP data
   }
 }

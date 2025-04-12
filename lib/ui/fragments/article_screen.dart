@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:olkonapp/domain/models/article.dart';
+import 'package:olkonapp/domain/models/comment.dart';
 import 'package:olkonapp/ui/view_models/article_view_model.dart';
 import 'package:provider/provider.dart';
 
 class ArticleScreen extends StatelessWidget {
-  final bool scrollToComments;
+  static const String routeName = 'article';
+
   final Article article;
+  final bool scrollToComments;
 
   const ArticleScreen({
     super.key,
@@ -13,14 +16,12 @@ class ArticleScreen extends StatelessWidget {
     this.scrollToComments = false,
   });
 
-  static const routeName = 'article';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
       body: Consumer<ArticleViewModel>(
-        builder: (context, viewModel, _) {
+        builder: (BuildContext context, ArticleViewModel viewModel, _) {
           // Прокрутка к комментариям после рендера
           if (scrollToComments) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -37,8 +38,14 @@ class ArticleScreen extends StatelessWidget {
                 const SizedBox(height: 10),
                 Image.network(
                   article.urlToImage,
-                  loadingBuilder: (context, child, progress) {
-                    if (progress == null) return child;
+                  loadingBuilder: (
+                    BuildContext context,
+                    Widget child,
+                    ImageChunkEvent? progress,
+                  ) {
+                    if (progress == null) {
+                      return child;
+                    }
                     return Center(
                       child: CircularProgressIndicator(
                         value:
@@ -72,7 +79,7 @@ class ArticleScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 ...viewModel.comments.map(
-                  (comment) => ListTile(
+                  (Comment comment) => ListTile(
                     leading: CircleAvatar(child: Text(comment.name[0])),
                     title: Text(comment.name),
                     subtitle: Column(

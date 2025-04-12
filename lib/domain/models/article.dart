@@ -16,6 +16,6 @@ class Article {
     required this.content,
     required this.url,
     this.commentsCount = 0,
-    this.comments = const [],
+    this.comments = const <Comment>[],
   });
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:olkonapp/domain/models/article.dart';
 import 'package:olkonapp/domain/user_repository.dart';
@@ -12,26 +13,28 @@ GoRouter getRouter(UserRepository userRepository) {
       GoRoute(
         path: '/${LoginScreen.routeName}',
         name: LoginScreen.routeName,
-        builder: (context, state) => const LoginScreen(),
+        builder:
+            (BuildContext context, GoRouterState state) => const LoginScreen(),
       ),
       GoRoute(
         path: '/${NewsScreen.routeName}',
         name: NewsScreen.routeName,
-        builder: (context, state) => const NewsScreen(),
+        builder:
+            (BuildContext context, GoRouterState state) => const NewsScreen(),
         routes: [
           GoRoute(
             path: ArticleScreen.routeName,
             name: ArticleScreen.routeName,
-            builder: (context, state) {
-              final article = state.extra as Article;
+            builder: (BuildContext context, GoRouterState state) {
+              final Article article = state.extra as Article;
               return ArticleScreen(article: article);
             },
           ),
         ],
       ),
     ],
-    redirect: (context, state) {
-      if (userRepository.getIsLoggedIn()) {
+    redirect: (BuildContext context, GoRouterState state) {
+      if (userRepository.getIsLoggedIn) {
         return '/${NewsScreen.routeName}';
       }
       // no need to redirect at all

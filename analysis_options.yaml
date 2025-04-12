@@ -9,20 +9,36 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+# This is a basic linter configuration that will follow the official Dart/Flutter style guide
 linter:
-  # The lint rules applied to this project can be customized in the
-  # section below to disable rules from the `package:flutter_lints/flutter.yaml`
-  # included above or to enable additional rules. A list of all available lints
-  # and their documentation is published at https://dart.dev/lints.
-  #
-  # Instead of disabling a lint rule for the entire project in the
-  # section below, it can also be suppressed for a single line of code
-  # or a specific dart file by using the `// ignore: name_of_lint` and
-  # `// ignore_for_file: name_of_lint` syntax on the line or in the file
-  # producing the lint.
   rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
-
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+    # Enforce the use of camelCase for variables and functions
+    camel_case_variables: true
+    camel_case_types: true
+    # Avoid using snake_case (we enforce camelCase instead)
+    always_put_control_body_on_new_line: true
+    # Enforce underscores for private fields and methods
+    private_method: true
+    private_members: true
+    # Use trailing commas in lists and maps to improve readability
+    prefer_trailing_comma: true
+    # Enforce const constructors whenever possible
+    prefer_const_constructors: true
+    # Avoid using `var` (it's better to use a specific type)
+    prefer_final_local_variables: true
+    # Prefer using `const` for immutable values
+    prefer_const_literals_to_create_immutables: true
+    # Flag for unnecessary `const` usage (e.g., widget constructors should only be `const` when necessary)
+    unnecessary_const: true
+    # Enable type-safe coding
+    type_annotate_public_apis: true
+    # Ensure proper spacing and indentation
+    always_specify_types: true
+    # Avoid unnecessary commented-out code
+    avoid_commenting_out_code: true
+    # Ensure that we have no unused imports
+    unused_import: true
+    # Enforce strong null safety checks
+    strong_mode: true
+    # Enforce use of async/await in async functions (no `.then()`)
+    avoid_async_await: false

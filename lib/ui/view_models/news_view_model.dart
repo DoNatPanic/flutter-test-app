@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:olkonapp/domain/models/article.dart';
 import 'package:olkonapp/domain/news_repository.dart';
@@ -6,24 +8,23 @@ import 'package:olkonapp/domain/user_repository.dart';
 class NewsViewModel extends ChangeNotifier {
   final NewsRepository newsRepository;
   final UserRepository userRepository;
-
-  final TextEditingController searchFieldController = TextEditingController();
-  List<Article> articles = [];
+  List<Article> articles = <Article>[];
   bool isLoading = false;
   String? error;
 
-  NewsViewModel({required this.newsRepository, required this.userRepository}) {
-    fetchNews();
-  }
+  String get userName => userRepository.getUserName ?? "";
 
-  String get userName => userRepository.getUserName() ?? "";
+  NewsViewModel({required this.newsRepository, required this.userRepository});
 
-  Future<void> fetchNews() async {
+  Future<void> fetchNews(String searchText) async {
+    if (searchText.isEmpty) {
+      return;
+    }
     isLoading = true;
     notifyListeners();
 
     try {
-      articles = await newsRepository.getNewsList(searchFieldController.text);
+      articles = await newsRepository.getNewsList(searchText);
       error = null;
     } catch (e) {
       error = e.toString();
@@ -35,11 +36,5 @@ class NewsViewModel extends ChangeNotifier {
 
   Future<void> logout() async {
     await userRepository.logout();
-  }
-
-  @override
-  void dispose() {
-    searchFieldController.dispose();
-    super.dispose();
   }
 }

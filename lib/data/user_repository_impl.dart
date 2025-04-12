@@ -2,38 +2,36 @@ import 'package:olkonapp/domain/user_repository.dart';
 import 'package:olkonapp/services/shared_preferences.dart';
 
 class UserRepositoryImpl implements UserRepository {
-  final SharedPreferencesService spService;
+  final SharedPreferencesService sharedPreferencesService;
 
-  UserRepositoryImpl({required this.spService});
-
-  bool _isLoggedIn = false;
-  String? _userName;
   static const String _userNameSP = 'userName';
   static const String _isLoggedInSP = 'isLoggedIn';
 
+  bool _isLoggedIn = false;
+  String? _userName;
   final bool isLoggedIn = false;
   final String? userName = null;
 
   @override
-  bool getIsLoggedIn() {
-    return _isLoggedIn;
-  }
+  bool get getIsLoggedIn => _isLoggedIn;
 
   @override
-  String? getUserName() {
-    return _userName;
-  }
+  String? get getUserName => _userName;
+
+  UserRepositoryImpl({required this.sharedPreferencesService});
 
   @override
   Future<void> loadUserData() async {
-    _userName = await spService.getString(_userNameSP);
-    _isLoggedIn = await spService.getBool(_isLoggedInSP) ?? false;
+    // извлекаем данные из SharedPreferences
+    _userName = await sharedPreferencesService.getString(_userNameSP);
+    _isLoggedIn =
+        await sharedPreferencesService.getBool(_isLoggedInSP) ?? false;
   }
 
   @override
   Future<void> logout() async {
     _isLoggedIn = false;
-    await spService.saveBool(_isLoggedInSP, _isLoggedIn);
+    await sharedPreferencesService.saveBool(_isLoggedInSP, _isLoggedIn);
   }
 
   @override
@@ -41,8 +39,8 @@ class UserRepositoryImpl implements UserRepository {
     _userName = name;
     _isLoggedIn = true;
     // Записываем данные в SharedPreferences
-    await spService.saveString(_userNameSP, _userName!);
-    await spService.saveBool(_isLoggedInSP, _isLoggedIn);
+    await sharedPreferencesService.saveString(_userNameSP, _userName!);
+    await sharedPreferencesService.saveBool(_isLoggedInSP, _isLoggedIn);
 
     // always true
     return true;

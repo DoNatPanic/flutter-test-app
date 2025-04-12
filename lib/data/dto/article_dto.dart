@@ -14,7 +14,7 @@ class ArticleDto {
   });
 
   Map<String, dynamic> toJson() {
-    return {
+    return <String, dynamic>{
       'title': title,
       'description': description,
       'urlToImage': urlToImage,

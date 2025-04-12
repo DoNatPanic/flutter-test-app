@@ -6,8 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class ArticleViewModel extends ChangeNotifier {
   final UserRepository userRepository;
-
-  final List<Comment> comments = [];
+  final List<Comment> comments = <Comment>[];
   final TextEditingController commentController = TextEditingController();
   final GlobalKey commentSectionKey = GlobalKey();
 
@@ -15,31 +14,14 @@ class ArticleViewModel extends ChangeNotifier {
     _loadInitialComments();
   }
 
-  void _loadInitialComments() {
-    // Пример начальных комментариев
-    comments.addAll(
-      List.generate(
-        6,
-        (index) => Comment(
-          name: 'John',
-          text: 'I learned a lot from the article, thanks!',
-          time: getTime(),
-        ),
-      ),
-    );
-  }
-
   void addComment(String commentText) {
-    final userName = userRepository.getUserName();
-    if (userName == null || commentText.isEmpty) return;
-
-    comments.add(Comment(name: userName, text: commentText, time: getTime()));
+    String? userName = userRepository.getUserName;
+    if (userName == null || commentText.isEmpty) {
+      return;
+    }
+    comments.add(Comment(name: userName, text: commentText, time: _getTime()));
     commentController.clear();
     notifyListeners();
-  }
-
-  String getTime() {
-    return DateFormat('dd-MM-yyyy hh:mm').format(DateTime.now());
   }
 
   String trimText(String input) {
@@ -50,14 +32,16 @@ class ArticleViewModel extends ChangeNotifier {
     try {
       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     } catch (_) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Cant open the website')));
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Cant open the website')));
+      }
     }
   }
 
   void scrollToComments() {
-    final context = commentSectionKey.currentContext;
+    BuildContext? context = commentSectionKey.currentContext;
     if (context != null) {
       Scrollable.ensureVisible(
         context,
@@ -71,5 +55,23 @@ class ArticleViewModel extends ChangeNotifier {
   void dispose() {
     commentController.dispose();
     super.dispose();
+  }
+
+  void _loadInitialComments() {
+    // Пример начальных комментариев
+    comments.addAll(
+      List<Comment>.generate(
+        6,
+        (int index) => Comment(
+          name: 'John',
+          text: 'I learned a lot from the article, thanks!',
+          time: _getTime(),
+        ),
+      ),
+    );
+  }
+
+  String _getTime() {
+    return DateFormat('dd-MM-yyyy hh:mm').format(DateTime.now());
   }
 }

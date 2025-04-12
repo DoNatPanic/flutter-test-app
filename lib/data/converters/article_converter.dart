@@ -3,11 +3,11 @@ import 'package:olkonapp/domain/models/article.dart';
 
 class ArticleConverter {
   List<Article> convertNews(List<ArticleDto> news) {
-    var list = news.map((item) => convert(item)).toList();
+    List<Article> list = news.map((ArticleDto item) => _convert(item)).toList();
     return list;
   }
 
-  Article convert(ArticleDto articleDto) {
+  Article _convert(ArticleDto articleDto) {
     return Article(
       title: articleDto.title ?? "",
       description: articleDto.description ?? "",

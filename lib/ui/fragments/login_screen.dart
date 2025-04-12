@@ -5,14 +5,14 @@ import 'package:olkonapp/ui/fragments/news_screen.dart';
 import 'package:olkonapp/ui/view_models/login_view_model.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+  static const String routeName = 'login';
 
-  static const routeName = 'login';
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Consumer<LoginViewModel>(
-      builder: (context, viewModel, _) {
+      builder: (BuildContext context, LoginViewModel viewModel, _) {
         return Scaffold(
           appBar: AppBar(title: const Text('Log In Page')),
           body: Padding(
@@ -22,24 +22,28 @@ class LoginScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextFormField(
-                    controller: viewModel.userNameController,
-                    decoration: const InputDecoration(
+                    onChanged: (String value) {
+                      viewModel.updateUserName(value); // Обновление пароля
+                    },
+                    decoration: InputDecoration(
                       labelText: 'Name',
-                      labelStyle: TextStyle(color: Colors.grey),
-                      border: OutlineInputBorder(),
+                      labelStyle: const TextStyle(color: Colors.grey),
+                      border: const OutlineInputBorder(),
+                      errorText: viewModel.validateUserName(),
                     ),
-                    validator: viewModel.validateUserName,
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
-                    controller: viewModel.passwordController,
+                    onChanged: (String value) {
+                      viewModel.updatePassword(value); // Обновление пароля
+                    },
                     obscureText: true,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Password',
-                      labelStyle: TextStyle(color: Colors.grey),
-                      border: OutlineInputBorder(),
+                      labelStyle: const TextStyle(color: Colors.grey),
+                      border: const OutlineInputBorder(),
+                      errorText: viewModel.validatePassword(),
                     ),
-                    validator: viewModel.validatePassword,
                   ),
                   const SizedBox(height: 30),
                   SizedBox(
@@ -50,7 +54,8 @@ class LoginScreen extends StatelessWidget {
                               ? null
                               : () async {
                                 await viewModel.login();
-                                if (context.mounted) {
+                                if (context.mounted &&
+                                    !viewModel.isLoginError) {
                                   context.goNamed(NewsScreen.routeName);
                                 }
                               },
