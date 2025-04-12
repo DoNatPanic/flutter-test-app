@@ -1,62 +1,28 @@
-import 'package:shared_preferences/shared_preferences.dart';
-
-class SharedPreferencesService {
-  // Получить объект SharedPreferences
-  Future<SharedPreferences> _getPreferences() async {
-    return await SharedPreferences.getInstance();
-  }
-
+abstract class SharedPreferencesService {
   // Сохранение строки
-  Future<void> saveString(String key, String value) async {
-    final SharedPreferences prefs = await _getPreferences();
-    await prefs.setString(key, value);
-  }
+  Future<void> saveString(String key, String value);
 
   // Получение строки
-  Future<String?> getString(String key) async {
-    final SharedPreferences prefs = await _getPreferences();
-    return prefs.getString(key);
-  }
+  Future<String?> getString(String key);
 
   // Сохранение целого числа
-  Future<void> saveInt(String key, int value) async {
-    final SharedPreferences prefs = await _getPreferences();
-    await prefs.setInt(key, value);
-  }
+  Future<void> saveInt(String key, int value);
 
   // Получение целого числа
-  Future<int?> getInt(String key) async {
-    final SharedPreferences prefs = await _getPreferences();
-    return prefs.getInt(key);
-  }
+  Future<int?> getInt(String key);
 
   // Сохранение булевого значения
-  Future<void> saveBool(String key, bool value) async {
-    final SharedPreferences prefs = await _getPreferences();
-    await prefs.setBool(key, value);
-  }
+  Future<void> saveBool(String key, bool value);
 
   // Получение булевого значения
-  Future<bool?> getBool(String key) async {
-    final SharedPreferences prefs = await _getPreferences();
-    return prefs.getBool(key);
-  }
+  Future<bool?> getBool(String key);
 
   // Удаление значения по ключу
-  Future<void> remove(String key) async {
-    final SharedPreferences prefs = await _getPreferences();
-    await prefs.remove(key);
-  }
+  Future<void> remove(String key);
 
   // Проверка, существует ли ключ
-  Future<bool> containsKey(String key) async {
-    final SharedPreferences prefs = await _getPreferences();
-    return prefs.containsKey(key);
-  }
+  Future<bool> containsKey(String key);
 
   // Очистка всех данных
-  Future<void> clear() async {
-    final SharedPreferences prefs = await _getPreferences();
-    await prefs.clear();
-  }
+  Future<void> clear();
 }

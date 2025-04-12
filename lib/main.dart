@@ -8,7 +8,9 @@ import 'package:olkonapp/domain/news_repository.dart';
 import 'package:olkonapp/domain/user_repository.dart';
 import 'package:olkonapp/router.dart';
 import 'package:olkonapp/services/news_api.dart';
+import 'package:olkonapp/services/news_api_impl.dart';
 import 'package:olkonapp/services/shared_preferences.dart';
+import 'package:olkonapp/services/shared_preferences_impl.dart';
 import 'package:olkonapp/ui/fragments/news_screen.dart';
 import 'package:olkonapp/ui/view_models/article_view_model.dart';
 import 'package:olkonapp/ui/view_models/login_view_model.dart';
@@ -35,10 +37,10 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         Provider<SharedPreferencesService>(
-          create: (BuildContext context) => SharedPreferencesService(),
+          create: (BuildContext context) => SharedPreferencesServiceImpl(),
         ),
         Provider<NewsApiService>(
-          create: (BuildContext context) => NewsApiService(),
+          create: (BuildContext context) => NewsApiServiceImpl(),
         ),
         Provider<ArticleConverter>(
           create: (BuildContext context) => ArticleConverter(),
