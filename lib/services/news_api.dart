@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:olkonapp/data/dto/article_dto.dart';
 
 class NewsApiService {
-  static const String apiKey = "";
+  static final String? apiKey = dotenv.env['API_KEY'];
 
   String getUrl(String text) {
     if (text.isEmpty) {

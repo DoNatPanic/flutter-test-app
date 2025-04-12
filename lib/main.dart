@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:olkonapp/data/converters/article_converter.dart';
 import 'package:olkonapp/data/news_repository_impl.dart';
 import 'package:olkonapp/data/user_repository_impl.dart';
@@ -14,7 +15,9 @@ import 'package:olkonapp/ui/view_models/news_view_model.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
+  await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const MyApp());
 }
 
