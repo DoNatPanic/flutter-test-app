@@ -14,8 +14,8 @@ class NewsRepositoryImpl implements NewsRepository {
   });
 
   @override
-  Future<News> getNews(String text) async {
-    NewsDto newsDto = await newsApiService.fetchData(text);
+  Future<News> getNews(String text, int page) async {
+    NewsDto newsDto = await newsApiService.fetchData(text, page);
     return articleConverter.convertNews(newsDto);
   }
 }

@@ -21,6 +21,7 @@ class _NewsScreenState extends State<NewsScreen> {
   static const Duration _searchDebounceDelay = Duration(milliseconds: 1200);
 
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   Timer? _debounceTimer;
   bool _isSearchTextEmpty = true;
   late NewsViewModel _viewModel;
@@ -28,19 +29,21 @@ class _NewsScreenState extends State<NewsScreen> {
   @override
   void initState() {
     super.initState();
-    _searchController.addListener(_onSearchTextChanged);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
     _viewModel = context.read<NewsViewModel>();
+    _searchController.addListener(_onSearchTextChanged);
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200) {
+        _viewModel.onLastItemReached(_searchController.text);
+      }
+    });
   }
 
   @override
   void dispose() {
     _searchController.removeListener(_onSearchTextChanged);
     _searchController.dispose();
+    _scrollController.dispose();
     _debounceTimer?.cancel();
     super.dispose();
   }
@@ -77,7 +80,7 @@ class _NewsScreenState extends State<NewsScreen> {
                 labelStyle: const TextStyle(color: Colors.grey),
                 border: const OutlineInputBorder(),
               ),
-              onSubmitted: (_) => _viewModel.fetchNews(_searchController.text),
+              onSubmitted: (_) => _enterSearch(_searchController.text),
             ),
             const SizedBox(height: 16),
 
@@ -105,15 +108,15 @@ class _NewsScreenState extends State<NewsScreen> {
             // Список новостей
             Expanded(
               child:
-                  _viewModel.isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : _viewModel.error != null
+                  _viewModel.error != null
                       ? Center(
                         child: Text(
                           'Error: ${_viewModel.error}',
                           textAlign: TextAlign.center,
                         ),
                       )
+                      : _viewModel.articles.isEmpty && _viewModel.isLoading
+                      ? const Center(child: CircularProgressIndicator())
                       : _viewModel.articles.isEmpty
                       ? const Center(
                         child: Text(
@@ -122,50 +125,62 @@ class _NewsScreenState extends State<NewsScreen> {
                         ),
                       )
                       : ListView.builder(
-                        itemCount: _viewModel.articles.length,
+                        controller: _scrollController,
+                        itemCount:
+                            _viewModel.articles.length +
+                            (_viewModel.isLoading ? 1 : 0),
                         itemBuilder: (BuildContext context, int index) {
-                          final Article article = _viewModel.articles[index];
-                          return Card(
-                            margin: const EdgeInsets.symmetric(vertical: 4.0),
-                            elevation: 4.0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.all(16.0),
-                              title: Text(
-                                article.title,
-                                style: const TextStyle(fontSize: 18),
+                          if (index < _viewModel.articles.length) {
+                            final Article article = _viewModel.articles[index];
+                            return Card(
+                              margin: const EdgeInsets.symmetric(vertical: 4.0),
+                              elevation: 4.0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    article.description,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 16),
-                                  ),
-                                  TextButton(
-                                    onPressed:
-                                        () => _navigateToArticle(
-                                          context,
-                                          article,
-                                          scrollToComments: true,
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.all(16.0),
+                                title: Text(
+                                  article.title,
+                                  style: const TextStyle(fontSize: 18),
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      article.description,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                    TextButton(
+                                      onPressed:
+                                          () => _navigateToArticle(
+                                            context,
+                                            article,
+                                            scrollToComments: true,
+                                          ),
+                                      child: Text(
+                                        "Comments (${article.commentsCount})",
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.blue,
                                         ),
-                                    child: Text(
-                                      "Comments (${article.commentsCount})",
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.blue,
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
+                                onTap:
+                                    () => _navigateToArticle(context, article),
                               ),
-                              onTap: () => _navigateToArticle(context, article),
-                            ),
-                          );
+                            );
+                          } else {
+                            // Индикатор подгрузки внизу списка
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.0),
+                              child: Center(child: CircularProgressIndicator()),
+                            );
+                          }
                         },
                       ),
             ),
@@ -196,7 +211,7 @@ class _NewsScreenState extends State<NewsScreen> {
   }
 
   void _enterSearch(String searchText) {
-    _viewModel.fetchNews(searchText);
+    _viewModel.fetchNews(searchText, true);
   }
 
   void _clearSearch() {

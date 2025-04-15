@@ -4,13 +4,17 @@ import 'package:http/http.dart' as http;
 import 'package:olkonapp/data/dto/news_dto.dart';
 import 'package:olkonapp/services/news_api.dart';
 
+const int pageSize = 20;
+
 class NewsApiServiceImpl extends NewsApiService {
   static final String? _apiKey = dotenv.env['API_KEY'];
 
   // Получение данных с API (GET-запрос)
   @override
-  Future<NewsDto> fetchData(String text) async {
-    final http.Response response = await http.get(Uri.parse(_getUrl(text)));
+  Future<NewsDto> fetchData(String text, int page) async {
+    final http.Response response = await http.get(
+      Uri.parse(_getUrl(text, pageSize, page)),
+    );
 
     if (response.statusCode == 200) {
       // Если запрос успешен, возвращаем список новостей
@@ -22,7 +26,7 @@ class NewsApiServiceImpl extends NewsApiService {
     }
   }
 
-  String _getUrl(String text) {
-    return "https://newsapi.org/v2/everything?q=$text&sortBy=popularity&apiKey=$_apiKey";
+  String _getUrl(String text, int pageSize, int page) {
+    return "https://newsapi.org/v2/everything?q=$text&pageSize=$pageSize&page=$page&sortBy=popularity&apiKey=$_apiKey";
   }
 }
