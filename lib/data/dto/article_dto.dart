@@ -23,7 +23,6 @@ class ArticleDto {
     };
   }
 
-  // Factory constructor to create a UserDTO from JSON
   factory ArticleDto.fromJson(Map<String, dynamic> json) {
     return ArticleDto(
       title: json['title'],

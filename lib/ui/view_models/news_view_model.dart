@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:olkonapp/domain/models/article.dart';
+import 'package:olkonapp/domain/models/news.dart';
 import 'package:olkonapp/domain/news_repository.dart';
 import 'package:olkonapp/domain/user_repository.dart';
 
@@ -24,7 +25,8 @@ class NewsViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      articles = await newsRepository.getNewsList(searchText);
+      News news = await newsRepository.getNews(searchText);
+      articles = news.articles;
       error = null;
     } catch (e) {
       error = e.toString();

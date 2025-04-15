@@ -1,13 +1,23 @@
 import 'package:olkonapp/data/dto/article_dto.dart';
+import 'package:olkonapp/data/dto/news_dto.dart';
 import 'package:olkonapp/domain/models/article.dart';
+import 'package:olkonapp/domain/models/news.dart';
 
 class ArticleConverter {
-  List<Article> convertNews(List<ArticleDto> news) {
-    List<Article> list = news.map((ArticleDto item) => _convert(item)).toList();
-    return list;
+  News convertNews(NewsDto resultDto) {
+    return _convertNews(resultDto);
   }
 
-  Article _convert(ArticleDto articleDto) {
+  News _convertNews(NewsDto resultDto) {
+    List<Article> list =
+        resultDto.articles
+            ?.map((ArticleDto item) => _convertArticle(item))
+            .toList() ??
+        <Article>[];
+    return News(totalResults: resultDto.totalResults ?? 0, articles: list);
+  }
+
+  Article _convertArticle(ArticleDto articleDto) {
     return Article(
       title: articleDto.title ?? "",
       description: articleDto.description ?? "",

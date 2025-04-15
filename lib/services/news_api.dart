@@ -1,6 +1,6 @@
-import 'package:olkonapp/data/dto/article_dto.dart';
+import 'package:olkonapp/data/dto/news_dto.dart';
 
 abstract class NewsApiService {
   // Получение данных с API (GET-запрос)
-  Future<List<ArticleDto>> fetchData(String text);
+  Future<NewsDto> fetchData(String text);
 }

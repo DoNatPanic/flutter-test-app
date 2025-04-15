@@ -1,6 +1,6 @@
 import 'package:olkonapp/data/converters/article_converter.dart';
-import 'package:olkonapp/data/dto/article_dto.dart';
-import 'package:olkonapp/domain/models/article.dart';
+import 'package:olkonapp/data/dto/news_dto.dart';
+import 'package:olkonapp/domain/models/news.dart';
 import 'package:olkonapp/domain/news_repository.dart';
 import 'package:olkonapp/services/news_api.dart';
 
@@ -14,8 +14,8 @@ class NewsRepositoryImpl implements NewsRepository {
   });
 
   @override
-  Future<List<Article>> getNewsList(String text) async {
-    List<ArticleDto> news = await newsApiService.fetchData(text);
-    return articleConverter.convertNews(news);
+  Future<News> getNews(String text) async {
+    NewsDto newsDto = await newsApiService.fetchData(text);
+    return articleConverter.convertNews(newsDto);
   }
 }

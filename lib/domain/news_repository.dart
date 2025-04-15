@@ -1,5 +1,5 @@
-import 'package:olkonapp/domain/models/article.dart';
+import 'package:olkonapp/domain/models/news.dart';
 
 abstract class NewsRepository {
-  Future<List<Article>> getNewsList(String text);
+  Future<News> getNews(String text);
 }
