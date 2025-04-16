@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:olkonapp/domain/models/article.dart';
 import 'package:olkonapp/domain/models/news.dart';
-import 'package:olkonapp/domain/news_repository.dart';
-import 'package:olkonapp/domain/user_repository.dart';
-import 'package:olkonapp/services/news_api_impl.dart';
+import 'package:olkonapp/domain/repositories/news_repository.dart';
+import 'package:olkonapp/domain/repositories/user_repository.dart';
+import 'package:olkonapp/services/impls/news_api_service_impl.dart';
 
 class NewsViewModel extends ChangeNotifier {
   final NewsRepository newsRepository;

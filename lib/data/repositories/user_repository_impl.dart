@@ -1,5 +1,5 @@
-import 'package:olkonapp/domain/user_repository.dart';
-import 'package:olkonapp/services/shared_preferences.dart';
+import 'package:olkonapp/domain/repositories/user_repository.dart';
+import 'package:olkonapp/services/api/shared_preferences_service.dart';
 
 class UserRepositoryImpl implements UserRepository {
   final SharedPreferencesService sharedPreferencesService;

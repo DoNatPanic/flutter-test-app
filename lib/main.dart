@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:olkonapp/data/converters/article_converter.dart';
-import 'package:olkonapp/data/news_repository_impl.dart';
-import 'package:olkonapp/data/user_repository_impl.dart';
-import 'package:olkonapp/domain/news_repository.dart';
-import 'package:olkonapp/domain/user_repository.dart';
+import 'package:olkonapp/data/repositories/articles_repository_impl.dart';
+import 'package:olkonapp/data/repositories/news_repository_impl.dart';
+import 'package:olkonapp/data/repositories/user_repository_impl.dart';
+import 'package:olkonapp/domain/repositories/articles_repository.dart';
+import 'package:olkonapp/domain/repositories/news_repository.dart';
+import 'package:olkonapp/domain/repositories/user_repository.dart';
 import 'package:olkonapp/router.dart';
-import 'package:olkonapp/services/news_api.dart';
-import 'package:olkonapp/services/news_api_impl.dart';
-import 'package:olkonapp/services/shared_preferences.dart';
-import 'package:olkonapp/services/shared_preferences_impl.dart';
+import 'package:olkonapp/services/api/database_service.dart';
+import 'package:olkonapp/services/api/news_api_service.dart';
+import 'package:olkonapp/services/impls/database_service_impl.dart';
+import 'package:olkonapp/services/impls/news_api_service_impl.dart';
+import 'package:olkonapp/services/api/shared_preferences_service.dart';
+import 'package:olkonapp/services/impls/shared_preferences_service_impl.dart';
 import 'package:olkonapp/ui/fragments/news_screen.dart';
 import 'package:olkonapp/ui/view_models/article_view_model.dart';
 import 'package:olkonapp/ui/view_models/login_view_model.dart';
@@ -20,22 +24,14 @@ import 'package:provider/provider.dart';
 void main() async {
   await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized();
+  // Асинхронно создаём и инициализируем DatabaseService
+  final DatabaseService dbService = DatabaseServiceImpl();
+  await dbService.init();
 
-  runApp(const MyApp());
-}
-
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
+  runApp(
+    MultiProvider(
       providers: [
+        Provider<DatabaseService>.value(value: dbService),
         Provider<SharedPreferencesService>(
           create: (BuildContext context) => SharedPreferencesServiceImpl(),
         ),
@@ -60,6 +56,15 @@ class _MyAppState extends State<MyApp> {
                       )
                       as NewsRepository,
         ),
+        Provider<ArticlesRepository>(
+          create:
+              (BuildContext context) =>
+                  ArticlesRepositoryImpl(
+                        databaseService: context.read(),
+                        articleConverter: context.read(),
+                      )
+                      as ArticlesRepository,
+        ),
         ChangeNotifierProvider<NewsViewModel>(
           create:
               (BuildContext context) => NewsViewModel(
@@ -72,6 +77,7 @@ class _MyAppState extends State<MyApp> {
           create:
               (BuildContext context) => ArticleViewModel(
                 userRepository: context.read<UserRepository>(),
+                articlesRepository: context.read<ArticlesRepository>(),
               ),
         ),
         ChangeNotifierProvider<LoginViewModel>(
@@ -81,31 +87,31 @@ class _MyAppState extends State<MyApp> {
               ),
         ),
       ],
-      child: FutureBuilder<void>(
-        future: _loadStates(),
-        builder: ((BuildContext context, AsyncSnapshot<void> snapshot) {
-          UserRepository userRepository = Provider.of<UserRepository>(
-            context,
-            listen: false,
-          );
+      child: const MyApp(),
+    ),
+  );
+}
 
-          return FutureBuilder<void>(
-            future: userRepository.loadUserData(),
-            builder: ((BuildContext context, AsyncSnapshot<void> snapshot) {
-              GoRouter router = getRouter(userRepository); // Получаем роутер
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-              return MaterialApp.router(
-                debugShowCheckedModeBanner: false,
-                routerConfig: router,
-              );
-            }),
-          );
-        }),
-      ),
+  @override
+  Widget build(BuildContext context) {
+    UserRepository userRepository = Provider.of<UserRepository>(
+      context,
+      listen: false,
     );
-  }
 
-  Future<void> _loadStates() async {
-    // TODO load some SP data
+    return FutureBuilder<void>(
+      future: userRepository.loadUserData(),
+      builder: ((BuildContext context, AsyncSnapshot<void> snapshot) {
+        GoRouter router = getRouter(userRepository); // Получаем роутер
+
+        return MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          routerConfig: router,
+        );
+      }),
+    );
   }
 }

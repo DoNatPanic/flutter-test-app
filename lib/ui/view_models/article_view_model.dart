@@ -1,17 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:olkonapp/domain/repositories/articles_repository.dart';
+import 'package:olkonapp/domain/models/article.dart';
 import 'package:olkonapp/domain/models/comment.dart';
-import 'package:olkonapp/domain/user_repository.dart';
+import 'package:olkonapp/domain/repositories/user_repository.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ArticleViewModel extends ChangeNotifier {
   final UserRepository userRepository;
+  final ArticlesRepository articlesRepository;
   final List<Comment> comments = <Comment>[];
   final TextEditingController commentController = TextEditingController();
   final GlobalKey commentSectionKey = GlobalKey();
 
-  ArticleViewModel({required this.userRepository}) {
+  ArticleViewModel({
+    required this.userRepository,
+    required this.articlesRepository,
+  }) {
     _loadInitialComments();
+    var article = Article(
+      title: "title",
+      description: "description",
+      urlToImage: "urlToImage",
+      content: "content",
+      url: "url",
+      comments: <Comment>[],
+      commentsCount: 0,
+    );
+    articlesRepository.save(article);
   }
 
   void addComment(String commentText) {

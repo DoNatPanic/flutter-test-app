@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:olkonapp/domain/user_repository.dart';
+import 'package:olkonapp/domain/repositories/user_repository.dart';
 
 class LoginViewModel extends ChangeNotifier {
   final UserRepository userRepository;

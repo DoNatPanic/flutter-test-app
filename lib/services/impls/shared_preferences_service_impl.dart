@@ -1,7 +1,7 @@
-import 'package:olkonapp/services/shared_preferences.dart';
+import 'package:olkonapp/services/api/shared_preferences_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SharedPreferencesServiceImpl extends SharedPreferencesService {
+class SharedPreferencesServiceImpl implements SharedPreferencesService {
   // Получить объект SharedPreferences
   Future<SharedPreferences> _getPreferences() async {
     return await SharedPreferences.getInstance();

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:olkonapp/domain/models/article.dart';
-import 'package:olkonapp/domain/user_repository.dart';
+import 'package:olkonapp/domain/repositories/user_repository.dart';
 import 'package:olkonapp/ui/fragments/login_screen.dart';
 import 'package:olkonapp/ui/fragments/news_screen.dart';
 import 'package:olkonapp/ui/fragments/article_screen.dart';

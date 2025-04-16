@@ -44,10 +44,14 @@ dependencies:
   intl: ^0.18.0 
   url_launcher: ^6.3.1
   flutter_dotenv: ^5.0.2
+  floor: ^1.5.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  floor_generator: ^1.4.2
+  build_runner: ^2.1.2
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
