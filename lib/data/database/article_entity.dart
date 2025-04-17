@@ -8,8 +8,8 @@ class ArticleEntity {
   final String content;
   @primaryKey
   final String url;
-  final int commentsCount;
-  final String comments;
+  int commentsCount;
+  String comments;
 
   ArticleEntity({
     required this.title,

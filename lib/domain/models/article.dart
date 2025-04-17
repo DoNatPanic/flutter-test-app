@@ -6,8 +6,8 @@ class Article {
   final String urlToImage;
   final String content;
   final String url;
-  final int commentsCount;
-  final List<Comment> comments;
+  int commentsCount;
+  List<Comment> comments;
 
   Article({
     required this.title,

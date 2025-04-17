@@ -16,7 +16,6 @@ import 'package:olkonapp/services/impls/news_api_service_impl.dart';
 import 'package:olkonapp/services/api/shared_preferences_service.dart';
 import 'package:olkonapp/services/impls/shared_preferences_service_impl.dart';
 import 'package:olkonapp/ui/fragments/news_screen.dart';
-import 'package:olkonapp/ui/view_models/article_view_model.dart';
 import 'package:olkonapp/ui/view_models/login_view_model.dart';
 import 'package:olkonapp/ui/view_models/news_view_model.dart';
 import 'package:provider/provider.dart';
@@ -70,16 +69,17 @@ void main() async {
               (BuildContext context) => NewsViewModel(
                 newsRepository: context.read<NewsRepository>(),
                 userRepository: context.read<UserRepository>(),
+                articlesRepository: context.read<ArticlesRepository>(),
               ),
           child: const NewsScreen(),
         ),
-        ChangeNotifierProvider<ArticleViewModel>(
-          create:
-              (BuildContext context) => ArticleViewModel(
-                userRepository: context.read<UserRepository>(),
-                articlesRepository: context.read<ArticlesRepository>(),
-              ),
-        ),
+        // ChangeNotifierProvider<ArticleViewModel>(
+        //   create:
+        //       (BuildContext context) => ArticleViewModel(
+        //         userRepository: context.read<UserRepository>(),
+        //         articlesRepository: context.read<ArticlesRepository>(),
+        //       ),
+        // ),
         ChangeNotifierProvider<LoginViewModel>(
           create:
               (BuildContext context) => LoginViewModel(

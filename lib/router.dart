@@ -6,9 +6,13 @@ import 'package:olkonapp/ui/fragments/login_screen.dart';
 import 'package:olkonapp/ui/fragments/news_screen.dart';
 import 'package:olkonapp/ui/fragments/article_screen.dart';
 
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
+
 GoRouter getRouter(UserRepository userRepository) {
   return GoRouter(
     initialLocation: '/${LoginScreen.routeName}',
+    observers: [routeObserver],
     routes: [
       GoRoute(
         path: '/${LoginScreen.routeName}',

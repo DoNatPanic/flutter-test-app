@@ -14,25 +14,50 @@ class ArticlesRepositoryImpl implements ArticlesRepository {
   });
 
   @override
-  Future<Article> getArticleByUrl(String url) {
-    // TODO: implement getArticleByUrl
-    throw UnimplementedError();
+  Future<List<Article>> searchArticles(String text) async {
+    List<ArticleEntity> articleEntities = await databaseService.articleDao
+        .searchArticles(text);
+    return _convertToArticleList(articleEntities);
   }
 
   @override
-  Future<void> save(Article article) async {
-    databaseService.articleDao.insertArticle(convertToDB(article));
-    // TODO: implement save
-    // throw UnimplementedError();
+  Future<void> updateArticle(Article article) async {
+    ArticleEntity entity = _convertToEntity(article);
+    await databaseService.articleDao.updateArticle(entity);
   }
 
   @override
-  Future<List<Article>> searchArticles(String text) {
-    // TODO: implement searchArticles
-    throw UnimplementedError();
+  Future<List<Article>> insertUpdate(List<Article> articles) async {
+    List<ArticleEntity> entitiesList = _convertToEntitiesList(articles);
+    List<ArticleEntity> list = await databaseService.articleDao.insertUpdate(
+      entitiesList,
+    );
+    return _convertToArticleList(list);
   }
 
-  ArticleEntity convertToDB(Article article) {
-    return articleConverter.convertFromArticleToDB(article);
+  @override
+  Future<void> saveArticle(Article article) async {
+    ArticleEntity entity = _convertToEntity(article);
+    await databaseService.articleDao.saveArticle(entity);
+  }
+
+  Article _convertToArticle(ArticleEntity entity) {
+    return articleConverter.convertFromEntityToArticle(entity);
+  }
+
+  ArticleEntity _convertToEntity(Article article) {
+    return articleConverter.convertFromArticleToEntity(article);
+  }
+
+  List<Article> _convertToArticleList(List<ArticleEntity> entities) {
+    return entities
+        .map((ArticleEntity entity) => _convertToArticle(entity))
+        .toList();
+  }
+
+  List<ArticleEntity> _convertToEntitiesList(List<Article> articles) {
+    return articles
+        .map((Article article) => _convertToEntity(article))
+        .toList();
   }
 }

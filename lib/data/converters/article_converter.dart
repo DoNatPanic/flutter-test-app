@@ -33,7 +33,7 @@ class ArticleConverter {
     );
   }
 
-  ArticleEntity convertFromArticleToDB(Article article) {
+  ArticleEntity convertFromArticleToEntity(Article article) {
     return ArticleEntity(
       title: article.title,
       description: article.description,
@@ -44,6 +44,22 @@ class ArticleConverter {
       comments: jsonEncode(
         article.comments.map((Comment c) => c.toJson()).toList(),
       ),
+    );
+  }
+
+  // Метод преобразования из ArticleEntity в Article
+  Article convertFromEntityToArticle(ArticleEntity entity) {
+    return Article(
+      title: entity.title,
+      description: entity.description,
+      urlToImage: entity.urlToImage,
+      content: entity.content,
+      url: entity.url,
+      commentsCount: entity.commentsCount,
+      comments:
+          (json.decode(entity.comments) as List<dynamic>)
+              .map((dynamic e) => Comment.fromJson(e))
+              .toList(),
     );
   }
 }

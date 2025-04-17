@@ -114,7 +114,7 @@ class _$ArticleDao extends ArticleDao {
   _$ArticleDao(
     this.database,
     this.changeListener,
-  )   : _queryAdapter = QueryAdapter(database, changeListener),
+  )   : _queryAdapter = QueryAdapter(database),
         _articleEntityInsertionAdapter = InsertionAdapter(
             database,
             'Articles',
@@ -126,8 +126,20 @@ class _$ArticleDao extends ArticleDao {
                   'url': item.url,
                   'commentsCount': item.commentsCount,
                   'comments': item.comments
-                },
-            changeListener);
+                }),
+        _articleEntityUpdateAdapter = UpdateAdapter(
+            database,
+            'Articles',
+            ['url'],
+            (ArticleEntity item) => <String, Object?>{
+                  'title': item.title,
+                  'description': item.description,
+                  'urlToImage': item.urlToImage,
+                  'content': item.content,
+                  'url': item.url,
+                  'commentsCount': item.commentsCount,
+                  'comments': item.comments
+                });
 
   final sqflite.DatabaseExecutor database;
 
@@ -137,28 +149,19 @@ class _$ArticleDao extends ArticleDao {
 
   final InsertionAdapter<ArticleEntity> _articleEntityInsertionAdapter;
 
+  final UpdateAdapter<ArticleEntity> _articleEntityUpdateAdapter;
+
   @override
-  Future<List<ArticleEntity>> findAllArticles() async {
-    return _queryAdapter.queryList('SELECT * FROM Articles',
-        mapper: (Map<String, Object?> row) => ArticleEntity(
-            title: row['title'] as String,
-            description: row['description'] as String,
-            urlToImage: row['urlToImage'] as String,
-            content: row['content'] as String,
-            url: row['url'] as String,
-            commentsCount: row['commentsCount'] as int,
-            comments: row['comments'] as String));
+  Future<List<ArticleEntity>> searchArticles(String text) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM Articles WHERE title LIKE \'%\' || ?1 || \'%\' OR description LIKE \'%\' || ?1 || \'%\'',
+        mapper: (Map<String, Object?> row) => ArticleEntity(title: row['title'] as String, description: row['description'] as String, urlToImage: row['urlToImage'] as String, content: row['content'] as String, url: row['url'] as String, commentsCount: row['commentsCount'] as int, comments: row['comments'] as String),
+        arguments: [text]);
   }
 
   @override
-  Future<List<String>> findAllArticlesUrls() async {
-    return _queryAdapter.queryList('SELECT url FROM Articles',
-        mapper: (Map<String, Object?> row) => row.values.first as String);
-  }
-
-  @override
-  Stream<ArticleEntity?> findArtucleByUrl(String url) {
-    return _queryAdapter.queryStream('SELECT * FROM Articles WHERE url = ?1',
+  Future<ArticleEntity?> findArticleByUrl(String url) async {
+    return _queryAdapter.query('SELECT * FROM Articles WHERE url = ?1',
         mapper: (Map<String, Object?> row) => ArticleEntity(
             title: row['title'] as String,
             description: row['description'] as String,
@@ -167,14 +170,23 @@ class _$ArticleDao extends ArticleDao {
             url: row['url'] as String,
             commentsCount: row['commentsCount'] as int,
             comments: row['comments'] as String),
-        arguments: [url],
-        queryableName: 'Articles',
-        isView: false);
+        arguments: [url]);
+  }
+
+  @override
+  Future<void> saveArticle(ArticleEntity article) async {
+    await _articleEntityInsertionAdapter.insert(
+        article, OnConflictStrategy.abort);
   }
 
   @override
   Future<void> insertArticle(ArticleEntity article) async {
     await _articleEntityInsertionAdapter.insert(
         article, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updateArticle(ArticleEntity article) async {
+    await _articleEntityUpdateAdapter.update(article, OnConflictStrategy.abort);
   }
 }

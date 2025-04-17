@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:olkonapp/router.dart';
 import 'package:olkonapp/ui/view_models/news_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:olkonapp/domain/models/article.dart';
@@ -17,7 +18,7 @@ class NewsScreen extends StatefulWidget {
   State<NewsScreen> createState() => _NewsScreenState();
 }
 
-class _NewsScreenState extends State<NewsScreen> {
+class _NewsScreenState extends State<NewsScreen> with RouteAware {
   static const Duration _searchDebounceDelay = Duration(milliseconds: 1200);
 
   final TextEditingController _searchController = TextEditingController();
@@ -25,6 +26,12 @@ class _NewsScreenState extends State<NewsScreen> {
   Timer? _debounceTimer;
   bool _isSearchTextEmpty = true;
   late NewsViewModel _viewModel;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
 
   @override
   void initState() {
@@ -45,7 +52,14 @@ class _NewsScreenState extends State<NewsScreen> {
     _searchController.dispose();
     _scrollController.dispose();
     _debounceTimer?.cancel();
+    routeObserver.unsubscribe(this);
     super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Возврат на экран
+    context.read<NewsViewModel>().onReturnToScreen();
   }
 
   @override

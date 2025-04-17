@@ -9,34 +9,30 @@ import 'package:url_launcher/url_launcher.dart';
 class ArticleViewModel extends ChangeNotifier {
   final UserRepository userRepository;
   final ArticlesRepository articlesRepository;
-  final List<Comment> comments = <Comment>[];
+  final Article article;
   final TextEditingController commentController = TextEditingController();
-  final GlobalKey commentSectionKey = GlobalKey();
 
   ArticleViewModel({
+    required this.article,
     required this.userRepository,
     required this.articlesRepository,
-  }) {
-    _loadInitialComments();
-    var article = Article(
-      title: "title",
-      description: "description",
-      urlToImage: "urlToImage",
-      content: "content",
-      url: "url",
-      comments: <Comment>[],
-      commentsCount: 0,
-    );
-    articlesRepository.save(article);
-  }
+  });
 
   void addComment(String commentText) {
     String? userName = userRepository.getUserName;
     if (userName == null || commentText.isEmpty) {
       return;
     }
-    comments.add(Comment(name: userName, text: commentText, time: _getTime()));
+    Comment comment = Comment(
+      name: userName,
+      text: commentText,
+      time: _getTime(),
+    );
+
+    article.comments.add(comment);
+    article.commentsCount++;
     commentController.clear();
+    articlesRepository.updateArticle(article);
     notifyListeners();
   }
 
@@ -56,35 +52,10 @@ class ArticleViewModel extends ChangeNotifier {
     }
   }
 
-  void scrollToComments() {
-    BuildContext? context = commentSectionKey.currentContext;
-    if (context != null) {
-      Scrollable.ensureVisible(
-        context,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
   @override
   void dispose() {
     commentController.dispose();
     super.dispose();
-  }
-
-  void _loadInitialComments() {
-    // Пример начальных комментариев
-    comments.addAll(
-      List<Comment>.generate(
-        6,
-        (int index) => Comment(
-          name: 'John',
-          text: 'I learned a lot from the article, thanks!',
-          time: _getTime(),
-        ),
-      ),
-    );
   }
 
   String _getTime() {
